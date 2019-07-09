@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/mobile">
+    <head>
+        <link href="resources/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: right !important;
+            }
+
+            .ui-button-text-only .ui-button-text {
+                padding: 0.3em 0.4em;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header .ui-chkbox {
+                visibility: hidden;
+            }
+
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .year-spinner input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
+    <body>
+    <ui:composition>
+        <div align="center"  style="overflow: auto;">
+            <h:form id="form" style="width:100%">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:commandButton value="Add new Student" type="button" onclick="PF('dlg3').show();" /> 
+                <p:dataTable id="tbl" var="student" widgetVar="studentsTable"
+                             draggableColumns="true" 
+                             resizableColumns="true"  rowKey="#{student.id}" 
+                             selection="#{studentBean.selectedStudents}"
+                             filteredValue="#{studentBean.filteredStudents}"
+                             editMode="row" 
+                             rows="10" paginator="true" rowsPerPageTemplate="5,10,15" value="#{studentBean.studentList}" 
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             editable="true" style="margin-bottom:20px;width: 100%;" >
+                    <f:facet name="header">
+                        Students Records
+                        <p:outputPanel style="width:150px;float:left">
+                            <h:outputText value="Search all fields:" />
+                            <p:inputText id="globalFilter" onkeyup="PF('studentsTable').filter()" style="width:150px;" placeholder="Enter keyword"/>
+                        </p:outputPanel>
+                        <!--  <p:commandButton id="toggler" type="button" value="Columns" style="float:left" />-->
+                        <div style="float:right;padding-top: 5px;">
+                            <!--  <p:columnToggler datasource="tbl" trigger="toggler" />-->
+                            <h:commandLink id="xlsex">
+                                <p:graphicImage value="resources/images/excel.png" width="24"/>
+                                <p:dataExporter type="xls" target=":form:tbl" fileName="Students"  />
+                            </h:commandLink>
+                            <h:commandLink id="pdfex">
+                                <p:graphicImage value="resources/images/pdf.png" width="24"/>
+                                <p:dataExporter type="pdf" target=":form:tbl" fileName="Students"/>
+                            </h:commandLink>
+                            <h:commandLink id="csvex">
+                                <p:graphicImage value="resources/images/csv.png" width="24"/>
+                                <p:dataExporter type="csv" target=":form:tbl" fileName="Students" />
+                            </h:commandLink>
+                            <p:tooltip id="tp1" for="xlsex" value="Export to Excel"/>
+                            <p:tooltip id="tp2" for="pdfex" value="Export to PDF"/>
+                            <p:tooltip id="tp3" for="csvex" value="Export to CSV"/>
+                        </div>
+                    </f:facet>
+                    <p:ajax event="rowEdit" listener="#{studentBean.onRowEdit}" update=":form:msgs" />
+                    <p:ajax event="rowEditCancel" listener="#{studentBean.onRowCancel}" update=":form:msgs" />
+                    <p:ajax event="cellEdit"  listener="#{studentBean.onCellEdit}" update=":form:msgs" />
+                    <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+                    <p:column headerText="Id" sortBy="#{student.id}" filterBy="#{student.id}" filterMatchMode="contains">
+                        <p:cellEditor >
+                            <f:facet name="output"><h:outputText  value="#{student.id}" /></f:facet>
+                            <f:facet name="input"><p:inputText id="modelInput" value="#{student.id}" style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="First Name" sortBy="#{student.firstname}"  filterBy="#{student.firstname}" filterMatchMode="contains">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText  value="#{student.firstname}" /></f:facet>
+                            <f:facet name="input"><p:inputText value="#{student.firstname}" style="width:100%" label="fname"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Sur-Name" sortBy="#{student.surname}" filterBy="#{student.surname}" filterMatchMode="contains">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{student.surname}" /></f:facet>
+                            <f:facet name="input"><p:inputText value="#{student.surname}" style="width:100%" label="sname"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Course Name" sortBy="#{student.coursename}" filterBy="#{student.coursename}" filterMatchMode="contains">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{student.coursename}" /></f:facet>
+                            <f:facet name="input"><p:inputText value="#{student.coursename}" style="width:100%" label="course"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Year of Study" sortBy="#{student.yrofstudy}" filterBy="#{student.yrofstudy}"  filterMatchMode="contains">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{student.yrofstudy}" /></f:facet>
+                            <f:facet name="input"><p:inputText value="#{student.yrofstudy}" style="width:100%" label="study"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column exportable="false" style="width:35px">
+                        <p:rowEditor /></p:column>
+                    <p:column exportable="false" style="width:100px">
+                        <p:commandButton   oncomplete="PF('viewStudent').show();"  icon="ui-icon ui-icon-search" update=":form:stuDetail">
+                            <f:setPropertyActionListener value="#{student}" target="#{studentBean.selectedStudent}" />
+                        </p:commandButton> &nbsp;&nbsp;
+                        <p:commandButton   oncomplete="PF('delStudent').show();" icon="ui-icon ui-icon-trash" update=":form:delDetail">
+                            <f:setPropertyActionListener value="#{student}" target="#{studentBean.selectedStudent}" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <p:commandButton process="tbl" update=":form:multiStuDetail" icon="pi pi-search" value="View" oncomplete="PF('multiStuDialog').show()" />
+                    </f:facet>
+                </p:dataTable>
+
+                <p:dialog header="Selected Students" widgetVar="multiStuDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" width="600">
+                    <p:outputPanel id="multiStuDetail" style="text-align:center;">
+                        <ui:repeat value="#{studentBean.selectedStudents}" var="selStu">
+                            <h:outputText value="Fname:#{selStu.firstname} | Sname: #{selStu.surname} | Course:#{selStu.coursename}  |  #{selStu.yrofstudy} Year" style="display:block"/>
+                            <p:separator />
+                        </ui:repeat>
+                    </p:outputPanel>
+                </p:dialog>
+
+
+                <p:dialog header="delete Student" widgetVar="delStudent" showEffect="explode" hideEffect="bounce" height="200" width="300">
+                    <p:outputPanel id="delDetail" style="text-align:center;">
+                        <h:panelGrid columns="1" rendered="#{not empty studentBean.selectedStudent}">
+                            <h:outputText value="Are you sure you want to remove #{studentBean.selectedStudent.firstname} 
+                                          this process is irreverseable"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton action="#{studentBean.deleteStudent(studentBean.selectedStudent.id)}" icon="ui-icon ui-icon-trash"  />
+                                <p:commandButton oncomplete="PF('delStudent').hide();"  icon="ui-icon ui-icon-close" />
+                            </h:panelGrid>
+                        </h:panelGrid>  
+                    </p:outputPanel>     
+                </p:dialog>
+
+
+
+                <p:dialog header="View Student" widgetVar="viewStudent" showEffect="explode" hideEffect="bounce" height="200" width="400">
+                    <p:outputPanel id="stuDetail" style="text-align:center;">
+                        <h:panelGrid columns="1" rendered="#{not empty studentBean.selectedStudent}">
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Id:"/>
+                                <h:inputText value="#{studentBean.selectedStudent.id}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="First Name:"/>
+                                <h:inputText value="#{studentBean.selectedStudent.firstname}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Surname:"/>
+                                <h:inputText value="#{studentBean.selectedStudent.surname}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Course Name:"/>
+                                <h:inputText value="#{studentBean.selectedStudent.coursename}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Year of Study:"/>
+                                <h:inputText value="#{studentBean.selectedStudent.yrofstudy}"/>
+                            </h:panelGrid>
+                            <p:commandButton oncomplete="PF('viewStudent').hide();"  icon="ui-icon ui-icon-close" />
+                        </h:panelGrid>  
+                    </p:outputPanel>     
+                </p:dialog>
+            </h:form>
+        </div>
+
+
+        <p:dialog header="Create New Student" widgetVar="dlg3" showEffect="explode" hideEffect="bounce" height="200" width="400">
+            <h:form>
+                <h:panelGrid columns="1">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Enter First Name:"/>
+                        <h:inputText value="#{studentBean.newStudentList.firstname}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Enter Surname:"/>
+                        <h:inputText value="#{studentBean.newStudentList.surname}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Select Course Name:"/>
+                        <f:selectItem itemLabel="Choose Theme" itemValue="" />
+                        <f:selectItems value="#{studentBean.courseList}" var="stu" itemLabel="#{stu.courseName}" itemValue="#{stu.courseName}"/>
+                        <h:inputText value="#{studentBean.newStudentList.coursename}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Enter Year of Study:"/>
+                        <h:inputText value="#{studentBean.newStudentList.yrofstudy}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:commandButton icon="ui-icon ui-icon-check" action="#{studentBean.createStudent()}"  update=":form:msgs,:form:tbl"/>
+                        <p:commandButton oncomplete="PF('dlg3').hide();" icon="ui-icon ui-icon-close" />
+                    </h:panelGrid>
+                </h:panelGrid>  
+
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</body>
+</html>
